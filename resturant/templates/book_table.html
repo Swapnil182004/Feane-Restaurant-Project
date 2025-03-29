@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static %}
+{% block book_table_status %}active{% endblock book_table_status %}
+{% block class %} class="sub_page" {% endblock class %}
+
+{% block main %}
+
+  <!-- book section -->
+  <section class="book_section layout_padding">
+    <div class="container">
+      <div class="heading_container">
+        <h2>Book A Table</h2>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form_container">
+            <form action="{% url 'book_table' %}" method="POST">{% csrf_token %}
+              <div>
+                <input type="text" class="form-control" name="user_name" placeholder="Your Name" required/>
+              </div>
+              <div>
+                <input type="text" class="form-control" name="phone_number" placeholder="Phone Number" required/>
+              </div>
+              <div>
+                <input type="email" class="form-control" name="user_email" placeholder="Your Email" required/>
+              </div>
+              <div>
+                <select class="form-control nice-select wide" name="total_person" required>
+                  <option value="" disabled selected>How many persons?</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+              <div>
+                <input type="date" name="booking_date" class="form-control" required>
+              </div>
+              <div>
+                <input type="time" name="booking_time" class="form-control" required>
+              </div>
+
+              <div>
+                <label for="cab_required">Do you want a cab?</label>
+                <input type="checkbox" id="cab_required" name="cab_required">
+              </div>
+
+              <div id="pickup_location_field" style="display: none;">
+                <label for="pickup_location">Pickup Location:</label>
+                <input type="text" id="pickup_location" name="pickup_location" class="form-control" placeholder="Enter your location">
+                <button type="button" id="open_map" class="btn btn-secondary">Select on Map</button>
+              </div>
+
+              <div class="btn_box">
+                <button>Book Now</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="map_container">
+            <div id="googleMap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- end book section -->
+
+  <script>
+    document.getElementById("cab_required").addEventListener("change", function() {
+        let pickupField = document.getElementById("pickup_location_field");
+        if (this.checked) {
+            pickupField.style.display = "block";
+        } else {
+            pickupField.style.display = "none";
+        }
+    });
+
+    document.getElementById("open_map").addEventListener("click", function() {
+        let locationInput = document.getElementById("pickup_location");
+        let location = prompt("Enter your location (Google Maps API will be integrated)");
+        if (location) {
+            locationInput.value = location;
+        }
+    });
+  </script>
+
+{% endblock main %}
