@@ -47,36 +47,36 @@ def TableView(request):
     return render(request, 'book_table.html')
 
 def FeedbackView(request):
-    review = Feedback.objects.all()
+    review = Feedback.objects.all().order_by('-id')  # Show latest first
     return render(request, 'feedback.html', {'review' : review})
+
 
 def SubmitFeedback(request):
     if request.method == 'POST':
         name = request.POST.get('user_name', '').strip()
         feedback_description = request.POST.get('feedback_desc', '').strip()
         rating = request.POST.get('rating', '').strip()
-        photo = request.FILES.get('user_photo')  # Use request.FILES for images
+        photo = request.FILES.get('user_photo')
 
-        # Check for empty values
         if not name or not feedback_description or not rating:
-            return redirect('home')
+            messages.error(request, "Please fill out all required fields.")
+            return redirect('feedback')
 
         try:
-            rating = int(rating)  # Ensure rating is a valid integer
+            rating = int(rating)
         except ValueError:
-            return redirect('home')
+            messages.error(request, "Invalid rating value.")
+            return redirect('feedback')
 
-        # Save feedback to database
         review_data = Feedback(
             User_Name=name,
             Feedback_Description=feedback_description,
             Rating=rating,
-            User_Image=photo
+            User_Image=photo if photo else None
         )
-        # If the user uploaded an image, save it
-        if photo:
-            review_data.User_Image = photo
+        review_data.save()
 
-        return redirect('home')  # Redirect after submission
+        messages.success(request, "Thank you for your review!")
+        return redirect('feedback')
 
-    return render(request, 'feedback.html')  # If method is not POST, redirect to home page
+    return redirect('feedback')  # If GET request, redirect to feedback page
